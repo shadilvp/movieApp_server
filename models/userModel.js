@@ -10,6 +10,7 @@ const userSchema = new mongoose.Schema(
         email: {
             type: String,
             required: [true, "Please Enter Your Email"],
+            unique: true,
         },
 
         password: {
@@ -25,9 +26,13 @@ const userSchema = new mongoose.Schema(
         roll: {
             type: String,
             default: "user",
+            required:true
         },
 
-        cart: [],
+        cart: {
+                type:mongoose.Schema.Types.ObjectId,
+                ref:"Cart"
+        },
 
         orders: []
     }

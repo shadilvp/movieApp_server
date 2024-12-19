@@ -1,9 +1,10 @@
 import express from "express"
-import mongoose from "mongoose"
 const app = express()
 const port = 4000
 
-import useRouter from "./router/AuthRouter.js"
+import authRouter from "./router/AuthRouter.js"
+import adminRouter from "./router/adminRouter.js"
+import userRouter from "./router/userRouter.js"
 import connectDB from "./config/db.js"
 
 import cors from 'cors'
@@ -15,7 +16,9 @@ app.use(cors())
 
 connectDB();
 
-app.use('/api', useRouter)
+app.use('/api', authRouter)
+app.use('/api', userRouter)
+app.use('/api',adminRouter)
 
 app.listen(port,()=>{ //Connected to the server
     console.log(`the server is litening to http://localhost:${port}`)

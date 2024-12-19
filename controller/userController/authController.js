@@ -1,8 +1,10 @@
 import User from "../../models/userModel.js";
 
+//register a new User
+
 export const userRegister = async (req, res) => {
     try {
-        const { name, email, password } = req.body;
+        const { name, email, password, roll } = req.body;
 
         // Validate input fields
         if (!name || !email || !password) {
@@ -20,7 +22,9 @@ export const userRegister = async (req, res) => {
         const newUser = new User({
             name,
             email,
-            password // Storing plain password (Not recommended for production)
+            password,
+            roll
+            
         })
         console.log(newUser);
 
@@ -31,5 +35,30 @@ export const userRegister = async (req, res) => {
     } catch (error) {
         console.error('Error:', error); // Log the error
         res.status(500).json({ success: false, message: `Server error: ${error.message}` });
+    }
+}
+
+//User Loign
+
+export const loginUser = async (req,res) => {
+    try {
+        const {email,password} = req.body
+        if(!email || !password){
+            return res.status(404).json({success : false, message : "Please please all this required fields"})
+        }
+
+        const existingUser = await User.findOne({email})
+        if(!existingUser){
+            res.status(401).json({success : false,message:"No user is found"})
+        }
+        if(existingUser.roll === "admin"){
+            res.status(201).json({success : true, message: "Admin is logged succesfully ",data: existingUser})
+        }else{
+            res.status(201).json({success : true, message: "User is logged succesfully ",data: existingUser})
+        }
+
+    } catch (error) {
+        console.error('Error:',error)
+        res.status(500).json({success: false, message:`server error ${error.message}`})
     }
 }
