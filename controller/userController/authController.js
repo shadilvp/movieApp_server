@@ -1,6 +1,6 @@
 import User from "../../models/userModel.js";
 
-//register a new User
+//register a new User --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export const userRegister = async (req, res) => {
     try {
@@ -38,7 +38,7 @@ export const userRegister = async (req, res) => {
     }
 }
 
-//User Loign
+//User Loign ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export const loginUser = async (req,res) => {
     try {
@@ -49,16 +49,16 @@ export const loginUser = async (req,res) => {
 
         const existingUser = await User.findOne({email})
         if(!existingUser){
-            res.status(401).json({success : false,message:"No user is found"})
+           return  res.status(401).json({success : false,message:"No user is found"})
         }
         if(existingUser.roll === "admin"){
-            res.status(201).json({success : true, message: "Admin is logged succesfully ",data: existingUser})
+           return res.status(201).json({success : true, message: "Admin is logged succesfully ",data: existingUser})
         }else{
-            res.status(201).json({success : true, message: "User is logged succesfully ",data: existingUser})
+           return res.status(201).json({success : true, message: "User is logged succesfully ",data: existingUser})
         }
 
     } catch (error) {
         console.error('Error:',error)
-        res.status(500).json({success: false, message:`server error ${error.message}`})
+       return res.status(500).json({success: false, message:`server error ${error.message}`})
     }
 }

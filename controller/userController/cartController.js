@@ -2,12 +2,16 @@ import Cart from "../../models/cartModel.js";
 import Product from "../../models/productModel.js"
 import User from "../../models/userModel.js";
 
+
 export const addToCart = async (req,res) => {
     const {userId} = req.params;
     const {productId, quantity} = req.body;
     try {
 
         let user = await User.findById(userId)
+        if(!user){
+            return res.status(404).json({success:false,message:"user is not found"})
+        }
         let product = await Product.findById(productId)
         if(!product){ //checking the product is true
             return res.status(404).json({success:false,message:"product is not found"})
@@ -19,12 +23,27 @@ export const addToCart = async (req,res) => {
         }
 
         const existingProductIndex = cart.items.findIndex(item=>item.productId.toString()=== productId)
+
         if(existingProductIndex !== -1){ //if there is product then add it by quantity
             cart.items[existingProductIndex].quantity += quantity ;
         }else{ //else add new product
             cart.items.push({productId,quantity})
         }
+
+        let grandTotal = 0;
+        const updatedItems = await Promise.all(
+            cart.items.map(async(item)=>{
+                const productDetails = await Product.findById(item.productId)
+                const totalPrice = item.quantity * productDetails.price;
+                item.totalPrice = totalPrice;
+                grandTotal += totalPrice;
+                return item ;
+            })
+        )
+        cart.items = updatedItems
+        cart.totalAmount = grandTotal;
         await cart.save()
+
 
         user.cart = cart._id;
         await user.save();
@@ -70,6 +89,11 @@ export const removeFromCart = async (req,res) => {
             return res.status(404).json({ success: false, message: "Cart not found" });
         }
         cart.items = cart.items.filter(item => item.productId.toString() !== productId)
+        let grandTotal = 0;
+        cart.items.forEach(items => {
+            grandTotal += items.totalPrice;
+        })
+        cart.totalAmount = grandTotal
         await cart.save()
 
         res.status(200).json({ success: true, cart });
@@ -88,9 +112,12 @@ export const udpateQuantity = async (req,res) => {
         const {productId, action} = req.body;
         
         let cart = await Cart.findOne({userId});
-    
-        if(!cart){
-            res.status(404).json({success:false,message:"cart is not found"})
+        if (!cart) {
+            return res.status(404).json({ success: false, message: "cart not found" });
+        }
+        let product = await Product.findById(productId)
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found" });
         }
     
         const itemIndex = cart.items.findIndex(item => item.productId.toString() === productId)
@@ -105,6 +132,15 @@ export const udpateQuantity = async (req,res) => {
             }else{
                 res.status(400).json({success : false, message : "invalid action"})
             }
+
+            cart.items[itemIndex].totalPrice = cart.items[itemIndex].quantity * product.price ;
+            let grandTotal = 0 ;
+            cart.items.forEach(item => {
+                grandTotal += item.totalPrice ;
+            });
+
+            cart.totalAmount = grandTotal ;
+
             await cart.save()
             res.status(200).json({success:true, message:cart})
         }else{
