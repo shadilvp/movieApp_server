@@ -1,4 +1,5 @@
 import mongoose from "mongoose"
+import joi from "joi"
 
 const productSchema = mongoose.Schema(
     {
@@ -27,9 +28,20 @@ const productSchema = mongoose.Schema(
             type: String,
             required:[true, "Product image URL is required"],
         }
-    }
-    
+    }  
 )
+const validateProduct = (product) => {
+    const schema = joi.object(
+        {
+            name : joi.string().min(3).required(),
+            catagory : joi.string().valid("toys","dress","nutrition").required(),
+            price : joi.number().min(0).required(),
+            description : joi.string().min(10).required(),
+            quantity : joi.number().min(1).required(),
+            image : joi.string().uri().required()
+        })
+        return schema.validate(product)
+}
 
 const Product = mongoose.model("Product",productSchema)
-export default Product;
+export  {Product,validateProduct};

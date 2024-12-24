@@ -1,4 +1,6 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
+import bcrypt from "bcryptjs";
+import joi from "joi";
 
 const userSchema = new mongoose.Schema(
     {
@@ -38,8 +40,31 @@ const userSchema = new mongoose.Schema(
     }
 );
 
+const validateUser = (user) => {
+    const schema = joi.object(
+        {
+            name:joi.string().min(3).required(),
+            email:joi.string().email().required(),
+            password:joi.string().min(4).required(),
+        });
+    return schema.validate(user)
+}
+
+userSchema.pre('save', async function(next){
+    if(!this.isModified('password')){
+        return next()
+    }
+
+    try {
+        const salt = await bcrypt.genSalt(10);
+        this.password = await bcrypt.hash(this.password , salt);
+        next()
+    } catch (error) {
+        next(error)
+    }
+})
+
 const User = mongoose.model("User", userSchema)
 
-export default User ;
-
+export { User, validateUser };
 

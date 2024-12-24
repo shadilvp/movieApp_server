@@ -1,6 +1,5 @@
 import Cart from "../../models/cartModel.js";
-import Product from "../../models/productModel.js";
-import Order from "../../models/orderModel.js";
+import {Order,validateOrder} from "../../models/orderModel.js";
 
 export const createOrder = async (req,res) => {
     const {userId} = req.params;
@@ -10,6 +9,10 @@ export const createOrder = async (req,res) => {
         const cart = await Cart.findOne({userId}).populate("items.productId");
         if(!cart){
             return res.status(404).json({success:false,message:"cart is not found"})
+        }
+        const { error } = validateOrder(req.body);
+        if (error) {
+        return res.status(400).json({ success: false, message: error.details[0].message });
         }
         let totalAmount = 0;
         const updatedItems = cart.items.map(item => {
@@ -39,7 +42,7 @@ export const createOrder = async (req,res) => {
         cart.totalAmount = 0
         await cart.save()
         
-        res.status(200).json({success: true , message: newOrder})
+        res.status(200).json({success: true , message: `Your order is confirmed succesfully ${newOrder}`})
     } catch (error) {
         console.error(error);
         res.status(500).json({success:false,message:error.message})

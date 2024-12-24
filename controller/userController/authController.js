@@ -1,4 +1,5 @@
-import User from "../../models/userModel.js";
+import { User, validateUser } from "../../models/userModel.js";
+import bcrypt from "bcryptjs";
 
 //register a new User --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -7,8 +8,9 @@ export const userRegister = async (req, res) => {
         const { name, email, password, roll } = req.body;
 
         // Validate input fields
-        if (!name || !email || !password) {
-            return res.status(400).json({ success: false, message: "Please fill all required fields" });
+        const {error} = validateUser(req.body)
+        if (error) {
+            return res.status(400).json({ success: false, message: error.details[0].message });
         }
 
         console.log('Received data:', { name, email, password });
@@ -16,7 +18,7 @@ export const userRegister = async (req, res) => {
         // Check if user already exists
         const currentUser = await User.findOne({ email });
         if (currentUser) {
-            return res.status(404).json({ success: false, message: 'User already exists' });
+            return res.status(409).json({ success: false, message: 'User already exists' });
         }
 
         const newUser = new User({
@@ -51,6 +53,12 @@ export const loginUser = async (req,res) => {
         if(!existingUser){
            return  res.status(401).json({success : false,message:"No user is found"})
         }
+
+        const isMatch = await bcrypt.compare(String(password),String(existingUser.password))
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: 'Invalid credentials' });
+        }
+
         if(existingUser.roll === "admin"){
            return res.status(201).json({success : true, message: "Admin is logged succesfully ",data: existingUser})
         }else{
