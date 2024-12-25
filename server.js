@@ -6,13 +6,13 @@ import authRouter from "./router/AuthRouter.js"
 import adminRouter from "./router/adminRouter.js"
 import userRouter from "./router/userRouter.js"
 import connectDB from "./config/db.js"
+import errorHandler from "./middlewares/errorHandler.js"
 
-import cors from 'cors'
 
 connectDB()
 
 app.use(express.json())
-
+app.use(errorHandler)
 
 
 app.use('/api', authRouter)

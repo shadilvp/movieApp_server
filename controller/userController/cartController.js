@@ -6,7 +6,7 @@ import {User} from "../../models/userModel.js";
 export const addToCart = async (req,res) => {
     const {userId} = req.params;
     const {productId, quantity} = req.body;
-    try {
+
 
         let user = await User.findById(userId)
         if(!user){
@@ -49,10 +49,7 @@ export const addToCart = async (req,res) => {
         await user.save();
 
         res.status(200).json({success : true , message: "item is succesfully added to the cart",data : cart})
-    } catch (error) {
-        console.error("error message",error)
-     res.status(500).json({success : false , message:`there iis an error ocures ${error.message}`})
-    }
+
 }
 
 
@@ -61,7 +58,7 @@ export const addToCart = async (req,res) => {
 
 export const getCart = async (req,res) => {
     const {userId} = req.params
-    try {
+
         const cart =  await Cart.findOne({userId}).populate("items.productId","name price image")
         if(!cart){
             return res.status(404).json({success:false, message:"cart is not found"})
@@ -69,11 +66,7 @@ export const getCart = async (req,res) => {
 
         //for adding total and grand total
         res.status(200).json({success: true, cart})
-    } catch (error) {
-        console.error("error:",error);
-        res.status(500).json({ success: false, message: error.message });
-        
-    }
+
 }
 
 
@@ -83,7 +76,6 @@ export const removeFromCart = async (req,res) => {
     const {productId} = req.body;
     const {userId} = req.params;
 
-    try {
         const cart = await Cart.findOne({userId})
         if (!cart) {
             return res.status(404).json({ success: false, message: "Cart not found" });
@@ -98,16 +90,14 @@ export const removeFromCart = async (req,res) => {
 
         res.status(200).json({ success: true, cart });
 
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
+
 }
 
 
 //Increasing and Decreasing quantity from the Cart---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export const udpateQuantity = async (req,res) => {
-    try {
+
         const {userId} = req.params;
         const {productId, action} = req.body;
         
@@ -147,9 +137,5 @@ export const udpateQuantity = async (req,res) => {
             res.status(404).json({success:false,message:"cart is not found"})
         } 
 
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({success: false, message: error.message})
-    }
 
 }

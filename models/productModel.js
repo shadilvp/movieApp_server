@@ -8,7 +8,7 @@ const productSchema = mongoose.Schema(
             unique:true,
             required:[true,"Product name is required"],
         },
-        catagory:{
+        category:{
             type:String,
             required:[true,"Product catagory is required"],
         },
@@ -27,6 +27,10 @@ const productSchema = mongoose.Schema(
         image:{
             type: String,
             required:[true, "Product image URL is required"],
+        },
+        isDeleted:{
+            type:Boolean,
+            default:false
         }
     }  
 )
@@ -34,11 +38,11 @@ const validateProduct = (product) => {
     const schema = joi.object(
         {
             name : joi.string().min(3).required(),
-            catagory : joi.string().valid("toys","dress","nutrition").required(),
+            category : joi.string().valid("Toys","Dress","Nutrition").required(),
             price : joi.number().min(0).required(),
             description : joi.string().min(10).required(),
             quantity : joi.number().min(1).required(),
-            image : joi.string().uri().required()
+            image : joi.string().uri().required(),
         })
         return schema.validate(product)
 }
