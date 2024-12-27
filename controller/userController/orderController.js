@@ -1,5 +1,6 @@
 import Cart from "../../models/cartModel.js";
 import {Order,validateOrder} from "../../models/orderModel.js";
+import { Product } from "../../models/productModel.js";
 
 export const createOrder = async (req,res) => {
     const {userId} = req.params;
@@ -15,9 +16,15 @@ export const createOrder = async (req,res) => {
         return res.status(400).json({ success: false, message: error.details[0].message });
         }
         let totalAmount = 0;
-        const updatedItems = cart.items.map(item => {
+        const updatedItems = cart.items.map(async(item) => {
             let totalPrice = item.productId.price * item.quantity;
             totalAmount += totalPrice;
+
+            await Product.findByIdAndUpdate(
+                item.productId._id,
+                {$inc:{purchasedQuantity:item.quantity}},
+                {new:true}
+            )
             return{
                 productId : item.productId,
                 quantity : item.quantity,
@@ -35,6 +42,7 @@ export const createOrder = async (req,res) => {
             totalAmount,
             address,
         })
+
     
         await newOrder.save()
     

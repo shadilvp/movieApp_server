@@ -28,6 +28,10 @@ const productSchema = mongoose.Schema(
             type: String,
             required:[true, "Product image URL is required"],
         },
+        purchasedQuantity:{
+            type:Number,
+            default:0,
+        },
         isDeleted:{
             type:Boolean,
             default:false

@@ -16,8 +16,8 @@ app.use(errorHandler)
 
 
 app.use('/api', authRouter)
-app.use('/api', userRouter)
-app.use('/api',adminRouter)
+app.use('/api/users', userRouter)
+app.use('/api/admin',adminRouter)
 
 app.listen(port,()=>{ //Connected to the server
     console.log(`the server is litening to http://localhost:${port}`)
