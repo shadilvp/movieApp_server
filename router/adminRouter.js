@@ -14,8 +14,12 @@ import { getAllUsers,specificUser,blockUser,deleteUser,deleteUserPermenently } f
 // import { blockUser } from "../controller/adminController/userController.js"
 // import { specificUser } from "../controller/adminController/userController.js"
 
+import { getDashboardDetails } from "../controller/adminController/dashBoardController.js"
 
 const router = express.Router()
+
+//Dashboard
+router.get('/dashboard',asyncHandler(getDashboardDetails)) 
 
 //product
 router.post('/addproduct',asyncHandler(addProduct))//posting an product
@@ -27,7 +31,7 @@ router.delete('/product-delete/permenent/:productId',asyncHandler(deleteProductP
 
 //user
 router.get('/users',asyncHandler(getAllUsers))
-router.get('users/:userId', asyncHandler(specificUser))
+router.get('/users/:userId', asyncHandler(specificUser))
 router.patch('/users/:userId/block',asyncHandler(blockUser))
 router.delete('/users/:userId/delete',asyncHandler(deleteUser))
 router.delete('/users/:userId/delete-permenently',asyncHandler(deleteUserPermenently))

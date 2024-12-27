@@ -42,9 +42,12 @@ export const blockUser = async (req, res) => {
                 res.status(404).json({success:false,message:"User is not available"})
         }
 
-        user.isBlock = true ;
+        user.isBlock = !user.isBlock ;
         await user.save()
-        return res.status(200).json({success:true,message:"user is blocked succesfully",user})
+
+        const action = user.isBlock ? "blocked" : "unblocked";
+
+        return res.status(200).json({success:true,message:`User has been successfully ${action}`,user})
 }
 
 
