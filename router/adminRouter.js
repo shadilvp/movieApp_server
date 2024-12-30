@@ -2,24 +2,18 @@ import express from "express"
 import { asyncHandler } from "../utils/asyncHandler.js"
 
 import { addProduct,getAllProducts,specificProduct,editProduct,deleteProduct,deleteProductPermenently } from "../controller/adminController/productController.js"
-// import { getAllProducts } from "../controller/adminController/productController.js" 
-// import { deleteProduct } from "../controller/adminController/productController.js"
-// import { deleteProductPermenently } from "../controller/adminController/productController.js"
-// import { specificProduct } from "../controller/adminController/productController.js"
-// import { editProduct } from "../controller/adminController/productController.js"
+
 
 import { getAllUsers,specificUser,blockUser,deleteUser,deleteUserPermenently } from "../controller/adminController/userController.js"
-// import { deleteUser } from "../controller/adminController/userController.js"
-// import { deleteUserPermenently } from "../controller/adminController/userController.js"
-// import { blockUser } from "../controller/adminController/userController.js"
-// import { specificUser } from "../controller/adminController/userController.js"
+
 
 import { getDashboardDetails } from "../controller/adminController/dashBoardController.js"
+import { verifyToken } from "../middlewares/authMiddleware.js"
 
 const router = express.Router()
 
 //Dashboard
-router.get('/dashboard',asyncHandler(getDashboardDetails)) 
+router.get('/dashboard',asyncHandler(verifyToken, getDashboardDetails)) 
 
 //product
 router.post('/addproduct',asyncHandler(addProduct))//posting an product

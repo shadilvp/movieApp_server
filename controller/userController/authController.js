@@ -1,5 +1,9 @@
 import { User, validateUser } from "../../models/userModel.js";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken"
+
+
+const JWT_SECRET = "babyProducts967831"
 
 //register a new User --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -41,10 +45,9 @@ export const userRegister = async (req, res) => {
 
 export const loginUser = async (req,res) => {
 
+
         const {email,password} = req.body
-        if(!email || !password){
-            return res.status(404).json({success : false, message : "Please please all this required fields"})
-        }
+
 
         const existingUser = await User.findOne({email})
         if(!existingUser){
@@ -56,10 +59,21 @@ export const loginUser = async (req,res) => {
             return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
 
+        const token = jwt.sign(
+            {   
+                userId : existingUser._id,
+                email : existingUser.email
+            },
+            JWT_SECRET,
+            { 
+                expiresIn:'1h'
+            }
+        );
+
         if(existingUser.roll === "admin"){
-           return res.status(201).json({success : true, message: "Admin is logged succesfully ",data: existingUser})
+           return res.status(201).json({success : true, message: "Admin is logged succesfully ",data: existingUser,token})
         }else{
-           return res.status(201).json({success : true, message: "User is logged succesfully ",data: existingUser})
+           return res.status(201).json({success : true, message: "User is logged succesfully ",data: existingUser,token})
         }
 
 }
