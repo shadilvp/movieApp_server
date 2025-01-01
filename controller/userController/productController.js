@@ -4,10 +4,10 @@ import { Product } from "../../models/productModel.js";
 //getting all products in user ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export const getAllProductsUser = async (req,res) => {
-
     const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 20;
+    const limit = parseInt(req.query.limit) || 3;
     const skip = (page -1 ) * limit ;
+
 
     const products = await Product.find().skip(skip).limit(limit)
 

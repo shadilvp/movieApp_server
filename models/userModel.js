@@ -34,12 +34,15 @@ const userSchema = new mongoose.Schema(
             type:Boolean,
             default : false
         },
-        cart: {
-                type:mongoose.Schema.Types.ObjectId,
-                ref:"Cart"
-        },
-
-        orders: []
+        cart:{
+            type:mongoose.Schema.Types.ObjectId,
+            ref:"Cart"
+        },   
+        addresses:[{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: "Address"
+        }],
+        orders:[]
     }
 );
 

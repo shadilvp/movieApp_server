@@ -62,12 +62,12 @@ export const loginUser = async (req,res) => {
         const token = jwt.sign(
             {   
                 userId : existingUser._id,
-                email : existingUser.email
+                email : existingUser.email 
             },
             JWT_SECRET,
             { 
                 expiresIn:'1h'
-            }
+            } 
         );
 
         if(existingUser.roll === "admin"){

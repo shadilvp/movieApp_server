@@ -132,6 +132,7 @@ export const udpateQuantity = async (req,res) => {
             cart.totalAmount = grandTotal ;
 
             await cart.save()
+
             res.status(200).json({success:true, message:cart})
         }else{
             res.status(404).json({success:false,message:"cart is not found"})
