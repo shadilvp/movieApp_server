@@ -84,9 +84,9 @@ export const loginUser = async (req,res) => {
         res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
 
         if(existingUser.roll === "admin"){
-           return res.status(201).json({success : true, message: "Admin is logged succesfully ",data: existingUser,token})
+           return res.status(201).json({success : true, message: "Admin is logged succesfully ",data: existingUser,accessToken})
         }else{
-           return res.status(201).json({success : true, message: "User is logged succesfully ",data: existingUser,token})
+           return res.status(201).json({success : true, message: "User is logged succesfully ",data: existingUser,accessToken})
         }
 
 }
