@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken"
 
 
 const JWT_SECRET = "babyProducts967831"
+const JWT_REFRESH_SECRET = "bayProductsRefresh967831"
 
 //register a new User --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -59,7 +60,7 @@ export const loginUser = async (req,res) => {
             return res.status(400).json({ success: false, message: 'Invalid credentials' });
         }
 
-        const token = jwt.sign(
+        const accessToken = jwt.sign(
             {   
                 userId : existingUser._id,
                 email : existingUser.email 
@@ -70,10 +71,58 @@ export const loginUser = async (req,res) => {
             } 
         );
 
+        const refreshToken = jwt.sign(
+            { userId : existingUser._id,email:existingUser.email },
+            JWT_REFRESH_SECRET,
+            { expiresIn:"7d" }
+        )
+
+        existingUser.refreshToken = refreshToken;
+        await existingUser.save()
+
+        res.cookie('accessToken', accessToken, { httpOnly: true, secure: true });
+        res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: true });
+
         if(existingUser.roll === "admin"){
            return res.status(201).json({success : true, message: "Admin is logged succesfully ",data: existingUser,token})
         }else{
            return res.status(201).json({success : true, message: "User is logged succesfully ",data: existingUser,token})
         }
+
+}
+
+//Logout ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+export const logoutUser = (req, res) => {
+    res.clearCookie('accessToken');
+    res.clearCookie('refreshToken');
+    return res.status(200).json({ success: true, message: "Logged out successfully" });
+};
+
+
+//refreshToken ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+export const refreshToken = async (req,res) => {
+    const refreshToken = req.cookies.refreshToken;
+
+    if (!refreshToken) {
+        return res.status(403).json({ success: false, message: "No refresh token provided" });
+    }
+
+    const decoded = jwt.verify(refreshToken,JWT_REFRESH_SECRET);
+    const user = await User.findById(decoded.userId);
+
+    if (!user || user.refreshToken !== refreshToken) {
+        return res.status(403).json({ success: false, message: "Invalid refresh token" });
+    }
+
+    const newAccessToken = jwt.sign(
+        { userId: user._id, email: user.email },
+        JWT_SECRET,
+        { expiresIn: '1h' }
+    );
+
+    res.cookie('accessToken', newAccessToken, { httpOnly: true, secure: true });
+    return res.status(200).json({ success: true, message: "Access token refreshed" });
 
 }

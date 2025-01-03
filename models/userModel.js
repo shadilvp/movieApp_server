@@ -20,6 +20,9 @@ const userSchema = new mongoose.Schema(
             required: [true, "Please Enter A Password"],
         },
 
+        refreshToken: {
+             type: String, 
+            },
         isBlock: {
             type: Boolean,
             default: false,
