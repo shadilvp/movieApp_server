@@ -15,7 +15,7 @@ export const getAllUsers = async (req,res) => {
             currentPage : page,
             totalPages : Math.ceil(totalUsers/limit),
             totalProducts : totalUsers,
-            products : users,
+            users : users,
         });
 }
 
@@ -28,7 +28,7 @@ export const specificUser = async (req,res) => {
         if (!user) {
                 res.status(404).json({success:false,message:"User is not available"})
         }
-        res.status(200).json({success:true, message:user})
+        res.status(200).json({success:true, user})
         
 }
 

@@ -22,6 +22,11 @@ export const addToCart = async (req,res) => {
             cart = new Cart({userId, items:[]})
         }
 
+        const existingProduct = cart.items.find((item)=> item.productId._id.toString() == productId)
+        if(existingProduct){
+            return res.status(404).json({success:false, message:`product already in the cart`})
+        }
+
         const existingProductIndex = cart.items.findIndex(item=>item.productId.toString()=== productId)
 
         if(existingProductIndex !== -1){ //if there is product then add it by quantity
@@ -48,7 +53,7 @@ export const addToCart = async (req,res) => {
         user.cart = cart._id;
         await user.save();
 
-        res.status(200).json({success : true , message: "item is succesfully added to the cart",data : cart})
+        res.status(200).json({success : true , message: "item is succesfully added to the cart", cart})
 
 }
 
@@ -74,12 +79,13 @@ export const getCart = async (req,res) => {
 
 export const removeFromCart = async (req,res) => {
     const {productId} = req.body;
-    const {userId} = req.params;
+    const userId = req.user._id;
 
         const cart = await Cart.findOne({userId})
         if (!cart) {
             return res.status(404).json({ success: false, message: "Cart not found" });
         }
+
         cart.items = cart.items.filter(item => item.productId.toString() !== productId)
         let grandTotal = 0;
         cart.items.forEach(items => {
@@ -98,13 +104,16 @@ export const removeFromCart = async (req,res) => {
 
 export const udpateQuantity = async (req,res) => {
 
-        const {userId} = req.params;
+        
         const {productId, action} = req.body;
+        const userId = req.user._id;
+        console.log("user",userId)
         
         let cart = await Cart.findOne({userId});
         if (!cart) {
             return res.status(404).json({ success: false, message: "cart not found" });
         }
+        console.log("cart",cart)
         let product = await Product.findById(productId)
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found" });

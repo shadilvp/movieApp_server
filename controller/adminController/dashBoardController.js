@@ -12,7 +12,7 @@ export const getDashboardDetails = async (req,res) => {
    const totalOrders = await Order.countDocuments();
 
    const totalRevenue = await Order.aggregate([
-        {$group : {_id : null,totalRevenue:{$sum:"$totalPrice"} } }
+        {$group : {_id:null,totalRevenue:{$sum:"$totalAmount"} } }
    ]);
 
    const totalPurchased = await Product.aggregate([

@@ -1,7 +1,10 @@
 import express from "express"
 import cors from "cors"
+import dotenv from "dotenv"
 const app = express()
-const port = 4000
+
+dotenv.config()
+const port = process.env.PORT
 
 import authRouter from "./router/AuthRouter.js"
 import adminRouter from "./router/adminRouter.js"
@@ -24,7 +27,7 @@ app.use('/api', authRouter)
 app.use('/api/users', userRouter)
 app.use('/api/admin',adminRouter)
 
-app.listen(port,()=>{ //Connected to the server
+app.listen(port,()=>{
     console.log(`the server is litening to http://localhost:${port}`)
 })
 

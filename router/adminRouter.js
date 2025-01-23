@@ -13,7 +13,7 @@ import { verifyToken } from "../middlewares/authMiddleware.js"
 const router = express.Router()
 
 //Dashboard
-router.get('/dashboard',asyncHandler(verifyToken, getDashboardDetails)) 
+router.get('/dashboard',verifyToken,asyncHandler(getDashboardDetails)) 
 
 //product
 router.post('/addproduct',asyncHandler(addProduct))//posting an product

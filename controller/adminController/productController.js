@@ -2,7 +2,9 @@ import {Product,validateProduct} from "../../models/productModel.js"
 
 
 export const addProduct = async (req,res) => {
-            let Products = req.body
+            const newProduct = req.body
+            let Products = []
+            Products.push(newProduct);
 
         for (const productData of Products) {
             const { name, category, price, description, quantity, image } = productData;
@@ -27,27 +29,31 @@ export const addProduct = async (req,res) => {
             });
 
             await newProduct.save();
+
+            return res.status(201).json({
+                success:true,
+                message:"New product is added succesfully", 
+                newProduct
+            })
         }
 
-        return res.status(201).json({
-            success:true,
-            message:"New product is added succesfully", 
-            data:"products added succesfully"
-        })
-}
+        
+};
 
 
 // Getting all Products ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export const getAllProducts = async (req,res) => {
-
+    
         const page = parseInt(req.query.page) || 1;
         const limit = parseInt(req.query.limit) || 20;
         const skip = (page -1 ) * limit ;
+        const category = req.query.category || "";
 
-        const products = await Product.find().skip(skip).limit(limit)
+        const categoryFilter = category ? { category: category } : {};
+        const products = await Product.find(categoryFilter).skip(skip).limit(limit)
 
-        const totalProducts = await Product.countDocuments();
+        const totalProducts = await Product.countDocuments(categoryFilter);
         
         res.status(200).json({ 
             success: true, 
@@ -93,7 +99,7 @@ export const editProduct = async (req, res) => {
         message:"product updated successfully",
         data:updatedProduct
     })
-}
+};
 
 //Soft-Deleting a product ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
