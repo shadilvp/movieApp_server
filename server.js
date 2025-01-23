@@ -19,7 +19,7 @@ app.use(express.json())
 app.use(errorHandler)
 
 app.use(cors({
-    origin: 'http://localhost:5173',
+    origin: 'https://baby-productsdi.onrender.com',
     credentials:true
 }))
 
