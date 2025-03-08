@@ -1,12 +1,16 @@
+import { adminRegister, googleAuth, login, logout, refreshAccessToken, userRegister } from "../controller/shared/authController.js";
+import { asyncHandler } from "../utils/asyncHandler.js";
 import express from "express"
-import { userRegister } from "../controller/userController/authController.js"
-import { loginUser } from "../controller/userController/authController.js"
-import { asyncHandler } from "../utils/asyncHandler.js"
 
- const router = express.Router()
+const router = express.Router();
 
-router.post('/register', asyncHandler(userRegister) )
-router.post('/login', asyncHandler(loginUser) )
+router.post('/register-user', asyncHandler(userRegister));
+router.post('/google-auth', asyncHandler(googleAuth));
+router.post('/register-admin', asyncHandler(adminRegister));
+router.post('/login', asyncHandler(login))
+router.post("/logout", asyncHandler(logout))
+router.post('/refresh-token', refreshAccessToken)
 
 
 export default router;
+
