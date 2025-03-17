@@ -125,7 +125,7 @@ export const adminRegister = async (req, res) => {
     }
 
    //data recieved
-    console.log('Received data:', { name, email, password });
+    // console.log('Received data:', { name, email, password });
 
     const currentAdmin = await Admin.findOne({ email });
     if (currentAdmin) {
@@ -149,70 +149,43 @@ export const adminRegister = async (req, res) => {
 
 //Login --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-export const login = async (req, res) => {
-    // console.log("Login attempt:", req.body);
-    const { email, password } = req.body;
+export const loginUser = async (req, res) => {
+    try {
+        const { email, password } = req.body;
+        const user = await User.findOne({ email });
 
-    let user = await Admin.findOne({ email }); // Check Admin first
-    let role = "admin";
+        if (!user) {
+            return res.status(401).json({ success: false, message: "No user found" });
+        }
 
-    if (!user) {
-        user = await User.findOne({ email }); // If not Admin, check User
-        role = "user";
-    }
+        const isMatch = await bcrypt.compare(String(password), String(user.password));
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Invalid password" });
+        }
 
-    if (!user) {
-        return res.status(401).json({ success: false, message: "No user found" });
-    }
+        const accessToken = generateAccessToken(user);
+        const refreshToken = generateRefreshToken(user);
 
-    const isMatch = await bcrypt.compare(String(password), String(user.password));
-    if (!isMatch) {
-        return res.status(400).json({ success: false, message: "Invalid Password" });
-    }
+        user.refreshToken = refreshToken;
+        await user.save();
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
-
-    user.refreshToken = refreshToken;
-    await user.save();
-
-
-    res.cookie("accessToken", accessToken, {
-        httpOnly: true,
-        secure: false,
-        // sameSite: "Lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        // path: "/",
-    });
-
-    res.cookie("refreshToken", refreshToken, {
-        httpOnly: true,
-        secure: false,
-        // sameSite: "Lax",
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        // path: "/",
-    });
-
-
-    if (role === "admin") {
-        return res.status(200).json({
-            success: true,
-            message: "Admin successfully logged in",
-            role,
-            adminData: {
-                id: user._id,
-                name: user.name,
-                email: user.email,
-                role: user.role,
-            },
-            accessToken,
-            refreshToken,
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });
-    } else {
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
         return res.status(200).json({
             success: true,
             message: "User successfully logged in",
-            role,
             userData: {
                 id: user._id,
                 name: user.name,
@@ -220,6 +193,62 @@ export const login = async (req, res) => {
                 role: user.role,
             },
         });
+    } catch (error) {
+        console.error("Login Error:", error);
+        return res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+
+
+export const loginAdmin = async (req, res) => {
+    try {
+        console.log("hello")
+        const { email, password } = req.body;
+        const admin = await Admin.findOne({ email });
+
+        if (!admin) {
+            return res.status(401).json({ success: false, message: "No admin found" });
+        }
+
+        const isMatch = await bcrypt.compare(String(password), String(admin.password));
+        if (!isMatch) {
+            return res.status(400).json({ success: false, message: "Invalid password" });
+        }
+
+        const accessToken = generateAccessToken(admin);
+        const refreshToken = generateRefreshToken(admin);
+
+        admin.refreshToken = refreshToken;
+        await admin.save();
+
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            maxAge: 7 * 24 * 60 * 60 * 1000,
+        });
+
+        return res.status(200).json({
+            success: true,
+            message: "Admin successfully logged in",
+            adminData: {
+                id: admin._id,
+                name: admin.name,
+                email: admin.email,
+                role: admin.role,
+            },
+        });
+    } catch (error) {
+        console.error("Admin Login Error:", error);
+        return res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
 };
 
@@ -298,3 +327,10 @@ export const refreshAccessToken = async (req, res) => {
         res.status(403).json({ message: "Invalid or Expired Refresh Token" });
     }
 }
+
+
+
+
+//admin register ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+

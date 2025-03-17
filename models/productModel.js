@@ -1,55 +1,140 @@
-import mongoose from "mongoose"
-import joi from "joi"
+import mongoose from "mongoose";
 
-const productSchema = mongoose.Schema(
-    {
-        name : {
-            type:String,
-            unique:true,
-            required:[true,"Product name is required"],
+const productSchema = new mongoose.Schema({
+    name: {
+        type: String,
+        required: [true, "Product name is required"],
+    },
+    description: {
+        type: String,
+        required: [true, "Product description is required"],
+    },
+    price: {
+        type: Number,
+        required: [true, "Product price is required"],
+        min: [0, "Price must be a positive number"],
+    },
+    quantity: {
+        type: Number,
+        required: [true, "Quantity is required"],
+        min: [1, "At least one item should be in stock"],
+    },
+    category: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "Category",
+        required: [true, "Product category is required"],
+    },
+    brand: {
+        type: String,
+        required: [true, "Brand is required"],
+    },
+    vehicleCompatibility: {
+        type: [String], // Example: ["Toyota Corolla 2015-2018", "Honda Civic 2020"]
+        required: [true, "Compatible vehicles are required"],
+    },
+    partNumber: {
+        type: String, // Manufacturer part number (MPN)
+        unique: true,
+        required: [true, "Part number is required"],
+    },
+    images: {
+        type: [String], // Store Cloudinary image URLs
+        validate: {
+            validator: function (v) {
+                return v.length > 0;
+            },
+            message: "At least one product image is required",
         },
-        category:{
-            type:String,
-            required:[true,"Product catagory is required"],
-        },
-        price:{
-            type:Number,
-            required:[true,"Product price is required"],
-        },
-        description:{
-            type:String,
-            required:[true,"Product description is required"],
-        },
-        quantity:{
-            type:String,
-            required:[true,"Product quantity is required"],
-        },
-        image:{
-            type: String,
-            required:[true, "Product image URL is required"],
-        },
-        purchasedQuantity:{
-            type:Number,
-            default:0,
-        },
-        isDeleted:{
-            type:Boolean,
-            default:false
-        }
-    }  
-)
-const validateProduct = (product) => {
-    const schema = joi.object(
-        {
-            name : joi.string().min(3).required(),
-            category : joi.string().valid("Toys","Dress","Nutrition").required(),
-            price : joi.number().min(0).required(),
-            description : joi.string().min(10).required(),
-            quantity : joi.number().min(1).required(),
-            image : joi.string().uri().required(),
-        })
-        return schema.validate(product)
-}
+    },
+    weight: {
+        type: Number, // Weight in KG
+        required: [true, "Weight is required"],
+    },
+    dimensions: {
+        length: { type: Number, required: true }, // Length in CM
+        width: { type: Number, required: true },  // Width in CM
+        height: { type: Number, required: true }, // Height in CM
+    },
+    material: {
+        type: String, // Example: "Aluminum", "Steel", "Plastic"
+    },
+    warranty: {
+        type: String, // Example: "1 Year", "6 Months"
+    },
+    status: {
+        type: String,
+        enum: ["Available", "Out of Stock", "Discontinued"],
+        default: "Available",
+    },
+},
+{ timestamps: true },
+);
 
-const   Product = mongoose.model("Product",productSchema)
-export  {Product,validateProduct};
+const Product = mongoose.model("Product", productSchema);
+export { Product };
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import mongoose from "mongoose";
+
+// const productSchema = mongoose.Schema(
+//     {
+//         name : {
+//             type:String,
+//             unique:true,
+//             required:[true,"Product name is required"],
+//         },
+//         category: {
+//             type: mongoose.Schema.Types.ObjectId,
+//             ref: "Category",
+//             required: [true, "Product category is required"],
+//         },
+//         subCategory: {
+//             type: String,
+//             required: [true, "Product sub-category is required"],
+//         },
+//         price:{
+//             type:Number,
+//             required:[true,"Product price is required"],
+//         },
+//         description:{
+//             type:String,
+//             required:[true,"Product description is required"],
+//         },
+//         quantity:{
+//             type:String,
+//             required:[true,"Product quantity is required"],
+//         },
+//         image:{
+//             type: String,
+//             required:[true, "Product image URL is required"],
+//         },
+//         purchasedQuantity:{
+//             type:Number,
+//             default:0,
+//         },
+//         status:{
+//             type:String,
+//             enum:["available","unavailable"],
+//             default:"available",
+//         },
+//         isDeleted:{
+//             type:Boolean,
+//             default:false
+//         }
+//     }  
+// )
+
+
+// const   Product = mongoose.model("Product",productSchema)
+// export  {Product};

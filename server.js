@@ -7,6 +7,7 @@ dotenv.config()
 const port = process.env.PORT
 
 import authRouter from "./router/authRouter.js"
+import productRouter from "./router/productRouter.js"
 // import adminRouter from "./router/adminRouter.js"
 // import userRouter from "./router/userRouter.js"
 import connectDB from "./config/db.js"
@@ -24,6 +25,7 @@ app.use(cors({
 }))
 
 app.use('/api', authRouter)
+app.use('/api',productRouter)
 // app.use('/api/users', userRouter)
 // app.use('/api/admin',adminRouter)
 

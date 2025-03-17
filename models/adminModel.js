@@ -24,6 +24,9 @@ const adminSchema = new mongoose.Schema(
             default: "admin",
             required:true
         },
+        profileImage: {
+            type: String,
+        },
         isDeleted : {
             type:Boolean,
             default : false
