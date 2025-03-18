@@ -10,15 +10,21 @@ import { Product } from "../../models/productModel.js";
 
 export const addNewProduct = async (req, res) => {
     try {
-        if (!req.file) {
-            return res.status(400).json({ success: false, message: "Product image is required" });
+        console.log("Received Files:", req.files); // Debugging
+
+        if (!req.files || req.files.length === 0) {
+            return res.status(400).json({ success: false, message: "At least one product image is required" });
         }
 
         console.log("Raw Request Body:", req.body);
+        
+        const {
+            name, description, category, subCategory, quantity, price, 
+            brand, vehicleCompatibility, partNumber, weight, material, 
+            warranty, length, width, height 
+        } = req.body;
 
-        const { name, description, category, subCategory, quantity, price, condition, location, seller } = req.body;
         const userId = req.user?.id;
-
         console.log("User ID:", userId);
 
         // Validate category
@@ -36,18 +42,31 @@ export const addNewProduct = async (req, res) => {
             });
         }
 
+        // Upload images to Cloudinary
+        const imageUrls = req.files.map((file) => file.path);
+
+        // const imageUrl = req.file.path;
+
         // Prepare product data
         const productData = {
             name,
             description,
-            category, // Storing ObjectId
-            subCategory, // Storing ObjectId
+            category,
+            subCategory,
             quantity: Number(quantity),
             price: Number(price),
-            image: req.file.path,
-            condition,
-            location,
-            seller,
+            brand,
+            vehicleCompatibility: vehicleCompatibility.split(","), // Convert CSV to array
+            partNumber,
+            images: imageUrls, // Store Cloudinary image URLs
+            weight: Number(weight),
+            dimensions: {
+                length: Number(length),
+                width: Number(width),
+                height: Number(height),
+            },
+            material,
+            warranty
         };
 
         console.log("Parsed Product Data:", productData);
@@ -66,6 +85,7 @@ export const addNewProduct = async (req, res) => {
         return res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
 };
+
 
 
 

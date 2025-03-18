@@ -37,14 +37,9 @@ const productSchema = new mongoose.Schema({
         unique: true,
         required: [true, "Part number is required"],
     },
-    images: {
-        type: [String], // Store Cloudinary image URLs
-        validate: {
-            validator: function (v) {
-                return v.length > 0;
-            },
-            message: "At least one product image is required",
-        },
+    images: {  // Change from 'image' to 'images' (array)
+        type: [String], // Array of image URLs
+        required: [true, "At least one product image is required"],
     },
     weight: {
         type: Number, // Weight in KG
