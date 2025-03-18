@@ -1,5 +1,6 @@
 import { Category } from "../../models/categoryModel.js";
 import { Product } from "../../models/productModel.js";
+import mongoose from "mongoose";
 
 
 
@@ -109,6 +110,99 @@ export const addCategory = async (req, res) => {
         return res.status(201).json({ success: true, message: "Category added successfully", newCategory });
     } catch (error) {
         console.error("Error adding category:", error);
+        return res.status(500).json({ success: false, message: "Server error", error: error.message });
+    }
+};
+
+
+//get all products ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+export const getAllProducts = async(req,res) => {
+    try {
+        console.log("hello")
+        let { page, limit, search, category, minPrice,subCategory, maxPrice } = req.query ; 
+        
+        page = parseInt(page) || 1 ;
+        limit = parseInt(limit) || 10;
+        const skip = (page - 1) * limit;
+
+        let filter = {}
+
+        if(search){
+            filter.name = { $regex: search, $options: "i" };
+        };
+
+
+        if(category){
+            filter.category = category;
+        };
+
+        if(subCategory){
+            filter.subCategory = subCategory;
+        };
+
+        if (minPrice && maxPrice) {
+            filter.price = { $gte: parseInt(minPrice), $lte: parseInt(maxPrice) };
+        } else if (minPrice) {
+            filter.price = { $gte: parseInt(minPrice) };
+        } else if (maxPrice) {
+            filter.price = { $lte: parseInt(maxPrice) };
+        }
+
+
+
+        const products = await Product.find(filter)
+        .populate("category", "name")
+        .skip(skip)
+        .limit(limit);
+
+        const totalProducts = await Product.countDocuments(filter);
+
+        return res.status(200).json({
+            success: true,
+            products,
+            totalProducts,
+            totalPages: Math.ceil(totalProducts / limit),
+            currentPage: page,
+        });
+
+
+    } catch (error) {
+
+        console.error("Server Error:", error);
+        return res.status(500).json({
+            success: false,
+            message: "Server error",
+            error: error.message,
+        });
+    }
+  }
+
+
+
+//get specific product ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+export const getSpecificProduct = async (req, res) => {
+    const { productId } = req.params;
+
+    try {
+        // Validate productId
+        if (!mongoose.Types.ObjectId.isValid(productId)) {
+            return res.status(400).json({ success: false, message: "Invalid product ID" });
+        }
+
+        // Find product by ID
+        const product = await Product.findById(productId).populate("category", "name");
+
+        if (!product) {
+            return res.status(404).json({ success: false, message: "Product not found" });
+        }
+
+        return res.status(200).json({ success: true, product });
+    } catch (error) {
+        console.error("Error fetching product:", error);
         return res.status(500).json({ success: false, message: "Server error", error: error.message });
     }
 };
