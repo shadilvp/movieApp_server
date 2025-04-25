@@ -203,7 +203,7 @@ export const loginUser = async (req, res) => {
 
 export const loginAdmin = async (req, res) => {
     try {
-        console.log("hello")
+        // console.log("hello")
         const { email, password } = req.body;
         const admin = await Admin.findOne({ email });
 
@@ -245,6 +245,7 @@ export const loginAdmin = async (req, res) => {
                 email: admin.email,
                 role: admin.role,
             },
+            accessToken
         });
     } catch (error) {
         console.error("Admin Login Error:", error);
