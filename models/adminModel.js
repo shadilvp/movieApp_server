@@ -1,6 +1,5 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
-import joi from "joi";
 
 const adminSchema = new mongoose.Schema(
     {
@@ -23,6 +22,10 @@ const adminSchema = new mongoose.Schema(
             type: String,
             default: "admin",
             required:true
+        },
+        adminRoll: {
+            type: String,
+            required: true
         },
         profileImage: {
             type: String,

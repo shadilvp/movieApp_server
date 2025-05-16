@@ -203,18 +203,19 @@ export const loginUser = async (req, res) => {
 
 export const loginAdmin = async (req, res) => {
     try {
-        // console.log("hello")
         const { email, password } = req.body;
         const admin = await Admin.findOne({ email });
-
+        console.log("hello==================================",admin)
+        
         if (!admin) {
             return res.status(401).json({ success: false, message: "No admin found" });
         }
-
+        console.log("1")
         const isMatch = await bcrypt.compare(String(password), String(admin.password));
         if (!isMatch) {
             return res.status(400).json({ success: false, message: "Invalid password" });
         }
+        console.log("2")
 
         const accessToken = generateAccessToken(admin);
         const refreshToken = generateRefreshToken(admin);
@@ -235,7 +236,6 @@ export const loginAdmin = async (req, res) => {
             sameSite: "Strict",
             maxAge: 7 * 24 * 60 * 60 * 1000,
         });
-
         return res.status(200).json({
             success: true,
             message: "Admin successfully logged in",

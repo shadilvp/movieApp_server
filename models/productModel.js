@@ -56,6 +56,10 @@ const productSchema = new mongoose.Schema({
     warranty: {
         type: String, // Example: "1 Year", "6 Months"
     },
+    isdeleted: {
+        type: Boolean,
+        default: false
+    },
     status: {
         type: String,
         enum: ["Available", "Out of Stock", "Discontinued"],

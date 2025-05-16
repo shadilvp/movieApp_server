@@ -9,8 +9,9 @@ const port = process.env.PORT
 
 import authRouter from "./router/authRouter.js"
 import productRouter from "./router/productRouter.js"
-// import adminRouter from "./router/adminRouter.js"
+import adminRouter from "./router/adminRouter.js"
 import UserRouter from "./router/userRouter.js"
+import NotificationRouter from "./router/notificationRouter.js"
 import connectDB from "./config/db.js"
 import errorHandler from "./middlewares/errorHandler.js"
 
@@ -27,9 +28,10 @@ app.use(cors({
 }))
 
 app.use('/api', authRouter)
-app.use('/api',productRouter)
+app.use('/api', productRouter)
 app.use('/api', UserRouter)
-// app.use('/api/admin',adminRouter)
+app.use('/api', NotificationRouter)
+app.use('/api',adminRouter)
 
 app.listen(port,()=>{
     console.log(`the server is litening to http://localhost:${port}`)
