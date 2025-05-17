@@ -1,4 +1,3 @@
-import { Category } from "../../models/categoryModel.js";
 import { Product } from "../../models/productModel.js";
 import mongoose from "mongoose";
 
@@ -34,18 +33,12 @@ export const addNewProduct = async (req, res) => {
       length,
       width,
       height,
+      vehicleType
+
     } = req.body;
 
     const userId = req.user?.id;
     console.log("User ID:", userId);
-
-    // Validate category
-    const mainCategory = await Category.findById(category);
-    if (!mainCategory) {
-      return res
-        .status(400)
-        .json({ success: false, message: "Invalid main category ID" });
-    }
 
     // Upload images to Cloudinary
     const imageUrls = req.files.map((file) => file.path);
@@ -60,6 +53,7 @@ export const addNewProduct = async (req, res) => {
       quantity: Number(quantity),
       price: Number(price),
       brand,
+      vehicleType,
       vehicleCompatibility: vehicleCompatibility.split(","), // Convert CSV to array
       partNumber,
       images: imageUrls, // Store Cloudinary image URLs
@@ -94,32 +88,6 @@ export const addNewProduct = async (req, res) => {
 
 //categories -------------------------------------------------------------------------------------------------------------------------------------
 
-export const addCategory = async (req, res) => {
-  try {
-    const { catagory, vehicleType } = req.body;
-
-    // Create new category
-    const newCategory = new Category({ catagory, vehicleType });
-    await newCategory.save();
-
-    return res
-      .status(201)
-      .json({
-        success: true,
-        message: "Category added successfully",
-        newCategory,
-      });
-  } catch (error) {
-    console.error("Error adding category:", error);
-    return res
-      .status(500)
-      .json({ success: false, message: "Server error", error: error.message });
-  }
-};
-
-export const getCategories = async (req,res) => {
-    const catagories = await Category.find()
-}
 
 //get all products ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
