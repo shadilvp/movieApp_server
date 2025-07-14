@@ -1,19 +1,20 @@
+import { Category } from "../../models/categoryModel.js";
 import { Product } from "../../models/productModel.js";
 import mongoose from "mongoose";
+import { SubCategory } from "../../models/subCategoryModel.js";
 
 // Add new product -----------------------------------------------------------------------------------------------------------------------------------------
 
 export const addNewProduct = async (req, res) => {
   try {
-    console.log("Received Files:", req.files); // Debugging
+    console.log("hy");
+    console.log("Received Files:", req.files);
 
     if (!req.files || req.files.length === 0) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          message: "At least one product image is required",
-        });
+      return res.status(400).json({
+        success: false,
+        message: "At least one product image is required",
+      });
     }
 
     console.log("Raw Request Body:", req.body);
@@ -22,10 +23,13 @@ export const addNewProduct = async (req, res) => {
       name,
       description,
       category,
+      subCategory,
       quantity,
+      mrp,
       price,
       brand,
       vehicleCompatibility,
+      features,
       partNumber,
       weight,
       material,
@@ -33,12 +37,26 @@ export const addNewProduct = async (req, res) => {
       length,
       width,
       height,
-      vehicleType
-
+      color,
     } = req.body;
 
     const userId = req.user?.id;
     console.log("User ID:", userId);
+
+    if (
+      !name ||
+      !description ||
+      !category ||
+      !subCategory ||
+      !quantity ||
+      !mrp ||
+      !price
+    ) {
+      return res.status(400).json({
+        success: false,
+        message: " More Fields are required",
+      });
+    }
 
     // Upload images to Cloudinary
     const imageUrls = req.files.map((file) => file.path);
@@ -50,18 +68,21 @@ export const addNewProduct = async (req, res) => {
       name,
       description,
       category,
+      subCategory,
       quantity: Number(quantity),
+      mrp: Number(mrp),
       price: Number(price),
       brand,
-      vehicleType,
-      vehicleCompatibility: vehicleCompatibility.split(","), // Convert CSV to array
+      color: JSON.parse(color),
+      features: JSON.parse(features),
+      vehicleCompatibility: JSON.parse(vehicleCompatibility),
       partNumber,
       images: imageUrls, // Store Cloudinary image URLs
-      weight: Number(weight),
+      weight: weight ? Number(weight) : 0,
       dimensions: {
-        length: Number(length),
-        width: Number(width),
-        height: Number(height),
+        length: length ? Number(length) : 0,
+        width: width ? Number(width) : 0,
+        height: height ? Number(height) : 0,
       },
       material,
       warranty,
@@ -85,9 +106,6 @@ export const addNewProduct = async (req, res) => {
       .json({ success: false, message: "Server error", error: error.message });
   }
 };
-
-//categories -------------------------------------------------------------------------------------------------------------------------------------
-
 
 //get all products ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -197,4 +215,82 @@ export const deleteProducts = async (req, res) => {
   res
     .status(200)
     .json({ message: "Product marked as deleted", product: deletedProduct });
+};
+
+// Adding new Category
+
+export const AddCategory = async (req, res) => {
+  const image = req.file;
+  const { categoryname } = req.body;
+
+  if (!categoryname || !image) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Name and image are required" });
+  }
+
+  const imageUrl = image.path;
+
+  const newCategory = await Category.create({
+    categoryname,
+    image: imageUrl,
+  });
+  console.log("category", newCategory);
+
+  return res.status(201).json({
+    success: true,
+    message: "New category added successfully",
+    category: newCategory,
+  });
+};
+
+// Fetching Categories
+
+export const fetchCategories = async (req, res) => {
+  const categories = await Category.find();
+  return res.status(200).json({
+    success: true,
+    message: "Categories fetched succesfully",
+    categories,
+  });
+};
+
+// Adding new SubCategory
+
+export const AddSubCategory = async (req, res) => {
+  const image = req.file;
+  const { name, categoryId } = req.body;
+
+  if (!name || !image) {
+    return res
+      .status(400)
+      .json({ success: false, message: "Name and image are required" });
+  }
+
+  const imageUrl = image.path;
+
+  const newSubCategory = await SubCategory.create({
+    SubCategoryname: name,
+    parantCategory: categoryId,
+    image: imageUrl,
+  });
+  console.log("Subcategory", newSubCategory);
+
+  return res.status(201).json({
+    success: true,
+    message: "New Subcategory added successfully",
+    category: newSubCategory,
+  });
+};
+
+// Fetching subCategories
+
+export const fetchSubCategories = async (req, res) => {
+  const { categoryId } = req.params;
+  const subCategories = await SubCategory.find({ parentCategory: categoryId });
+  return res.status(200).json({
+    success: true,
+    message: "SubCategories fetched succesfully",
+    subCategories,
+  });
 };

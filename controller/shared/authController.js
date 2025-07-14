@@ -44,7 +44,7 @@ export const userRegister = async (req, res) => {
     const newUser = new User({
         name,
         email,
-        password
+        password,
 
     })
     console.log(newUser);
@@ -117,15 +117,15 @@ export const googleAuth = async (req, res) => {
 //Register a admin --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
 export const adminRegister = async (req, res) => {
-    const { name, email, password } = req.body;
+    const { name, email, password, phone, adminRoll } = req.body;
 
     const { error } = validateAdmin(req.body)
     if (error) {
         return res.status(400).json({ success: false, message: error.details[0].message });
     }
 
-   //data recieved
-    // console.log('Received data:', { name, email, password });
+//    data recieved
+    console.log('Received data:', { name, email, password, phone, adminRoll });
 
     const currentAdmin = await Admin.findOne({ email });
     if (currentAdmin) {
@@ -135,7 +135,9 @@ export const adminRegister = async (req, res) => {
     const newAdmin = new Admin({
         name,
         email,
-        password
+        password,    
+        phone,
+        adminRoll
 
     })
     console.log(newAdmin);

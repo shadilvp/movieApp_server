@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import joi from "joi";
 
 const adminSchema = new mongoose.Schema(
     {
@@ -23,8 +24,14 @@ const adminSchema = new mongoose.Schema(
             default: "admin",
             required:true
         },
+        phone: {
+            type: Number,
+            require: [true, "Please enter the phone number"],
+            unique: true,
+        },     
         adminRoll: {
             type: String,
+            require: [true, "Please enter the roll of admin"],
             required: true
         },
         profileImage: {
@@ -43,7 +50,9 @@ const validateAdmin = (admin) => {
         {
             name:joi.string().min(3).required(),
             email:joi.string().email().required(),
-            password: joi.string().min(6).required()
+            password: joi.string().min(6).required(),
+            phone: joi.number().min(10).required(),
+            adminRoll: joi.string().required()
         });
     return schema.validate(admin)
 };

@@ -6,9 +6,19 @@ const productSchema = new mongoose.Schema(
       type: String,
       required: [true, "Product name is required"],
     },
+    displayType: {
+      type: String,
+      default: "genaral",
+      enum: ["genaral", "advanced"]
+    },
     description: {
       type: String,
       required: [true, "Product description is required"],
+    },
+    mrp: {
+      type: Number,
+      required: [true, "Product price is required"],
+      min: [0, "Price must be a positive number"],
     },
     price: {
       type: Number,
@@ -21,30 +31,12 @@ const productSchema = new mongoose.Schema(
       min: [1, "At least one item should be in stock"],
     },
     category: {
-      type: String,
-      required: true,
-      enum: [
-        "Engine Parts",
-        "Transmission & Drivetrain",
-        "Suspension & Steering",
-        "Brakes",
-        "Electrical & Lighting",
-        "Cooling System",
-        "Fuel System",
-        "Air Conditioning & Heating",
-        "Body Parts",
-        "Interior Accessories",
-        "Exhaust System",
-        "Filters",
-        "Tires & Wheels",
-        "Lubricants & Fluids",
-        "Miscellaneous",
-      ],
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Category"
     },
-    vehicleType: {
-        type: String,
-        required: true,
-        enum: ["Bike", "Car", "Lorry", "Bus"]
+    subCategory: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SubCategory"
     },
     brand: {
       type: String,
@@ -52,11 +44,12 @@ const productSchema = new mongoose.Schema(
     },
     vehicleCompatibility: {
       type: [String], // Example: ["Toyota Corolla 2015-2018", "Honda Civic 2020"]
-      required: [true, "Compatible vehicles are required"],
+    },
+    features: {
+      type: [String], // Example: ["Toyota Corolla 2015-2018", "Honda Civic 2020"]
     },
     partNumber: {
       type: String, // Manufacturer part number (MPN)
-      required: [true, "Part number is required"],
     },
     images: {
       // Change from 'image' to 'images' (array)
@@ -65,7 +58,6 @@ const productSchema = new mongoose.Schema(
     },
     weight: {
       type: Number, // Weight in KG
-      required: [true, "Weight is required"],
     },
     dimensions: {
       length: { type: Number, required: true }, // Length in CM
@@ -84,9 +76,23 @@ const productSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["Available", "Out of Stock", "Discontinued"],
+      enum: ["Available", "Unavailable"],
       default: "Available",
     },
+    color: {
+      type: [String],
+    },
+    visibility: {
+      type: Boolean,
+      default:false
+    },
+    relatedItems: {
+      type:[String]
+    },
+    keyInfo:{
+      type: String,
+      enum: ["Genaral", "Advanced"],
+    }
   },
   { timestamps: true }
 );
@@ -94,55 +100,4 @@ const productSchema = new mongoose.Schema(
 const Product = mongoose.model("Product", productSchema);
 export { Product };
 
-// import mongoose from "mongoose";
 
-// const productSchema = mongoose.Schema(
-//     {
-//         name : {
-//             type:String,
-//             unique:true,
-//             required:[true,"Product name is required"],
-//         },
-//         category: {
-//             type: mongoose.Schema.Types.ObjectId,
-//             ref: "Category",
-//             required: [true, "Product category is required"],
-//         },
-//         subCategory: {
-//             type: String,
-//             required: [true, "Product sub-category is required"],
-//         },
-//         price:{
-//             type:Number,
-//             required:[true,"Product price is required"],
-//         },
-//         description:{
-//             type:String,
-//             required:[true,"Product description is required"],
-//         },
-//         quantity:{
-//             type:String,
-//             required:[true,"Product quantity is required"],
-//         },
-//         image:{
-//             type: String,
-//             required:[true, "Product image URL is required"],
-//         },
-//         purchasedQuantity:{
-//             type:Number,
-//             default:0,
-//         },
-//         status:{
-//             type:String,
-//             enum:["available","unavailable"],
-//             default:"available",
-//         },
-//         isDeleted:{
-//             type:Boolean,
-//             default:false
-//         }
-//     }
-// )
-
-// const   Product = mongoose.model("Product",productSchema)
-// export  {Product};
