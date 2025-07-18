@@ -91,7 +91,8 @@ const productSchema = new mongoose.Schema(
     },
     keyInfo:{
       type: String,
-      enum: ["Genaral", "Advanced"],
+      enum: ["general", "advanced"],
+      default: "general",
     }
   },
   { timestamps: true }
