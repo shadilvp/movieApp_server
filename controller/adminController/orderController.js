@@ -1,5 +1,6 @@
 import Order from "../../models/orderModel.js";
 import Cart from "../../models/cartModel.js";
+import { Product } from "../../models/productModel.js";
 
 export const placeOrder = async (req, res) => {
   const userId = req.user.id;
@@ -33,7 +34,14 @@ export const placeOrder = async (req, res) => {
 
     await newOrder.save();
 
-    // Clear cart after placing order
+    for (const item of orderItems) {
+      await Product.findByIdAndUpdate(
+        item.productId,
+        { $inc: { quantity: -item.quantity } },
+        { new: true }
+      );
+    }
+
     cart.items = [];
     cart.totalAmount = 0;
     await cart.save();

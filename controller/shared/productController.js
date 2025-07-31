@@ -141,7 +141,8 @@ export const getAllProducts = async (req, res) => {
     }
 
     const products = await Product.find(filter)
-      .populate("category", "name")
+      .populate("category", "categoryname")
+      .populate("subCategory", "subCategoryname")
       .skip(skip)
       .limit(limit);
 

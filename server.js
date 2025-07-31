@@ -14,6 +14,7 @@ import UserRouter from "./router/userRouter.js"
 import NotificationRouter from "./router/notificationRouter.js"
 import cartRouter from "./router/cartRouter.js"
 import orderRouter from "./router/orderRouter.js"
+import offerRouter from "./router/offerRouter.js"
 
 import connectDB from "./config/db.js"
 import errorHandler from "./middlewares/errorHandler.js"
@@ -37,6 +38,8 @@ app.use('/api', NotificationRouter)
 app.use('/api',adminRouter)
 app.use('/api/cart', cartRouter)
 app.use('/api/order', orderRouter)
+app.use('/api/offer', offerRouter)
+
 
 app.listen(port,()=>{
     console.log(`the server is litening to http://localhost:${port}`)

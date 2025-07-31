@@ -125,47 +125,7 @@ export const googleAuth = async (req, res) => {
   }
 };
 
-//Register a admin --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
-export const adminRegister = async (req, res) => {
-  const { name, email, password, phone, adminRoll } = req.body;
-
-  const { error } = validateAdmin(req.body);
-  if (error) {
-    return res
-      .status(400)
-      .json({ success: false, message: error.details[0].message });
-  }
-
-  //    data recieved
-  console.log("Received data:", { name, email, password, phone, adminRoll });
-
-  const currentAdmin = await Admin.findOne({ email });
-  if (currentAdmin) {
-    return res
-      .status(409)
-      .json({ success: false, message: "Admin already exists" });
-  }
-
-  const newAdmin = new Admin({
-    name,
-    email,
-    password,
-    phone,
-    adminRoll,
-  });
-  console.log(newAdmin);
-
-  await newAdmin.save();
-
-  return res
-    .status(201)
-    .json({
-      success: true,
-      message: "Admin successfully registered",
-      data: newAdmin,
-    });
-};
 
 //Login --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 
@@ -224,6 +184,48 @@ export const loginUser = async (req, res) => {
       .status(500)
       .json({ success: false, message: "Server error", error: error.message });
   }
+};
+
+//Register a admin --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+export const adminRegister = async (req, res) => {
+  const { name, email, password, phone, adminRoll } = req.body;
+
+  const { error } = validateAdmin(req.body);
+  if (error) {
+    return res
+      .status(400)
+      .json({ success: false, message: error.details[0].message });
+  }
+
+  //    data recieved
+  console.log("Received data:", { name, email, password, phone, adminRoll });
+
+  const currentAdmin = await Admin.findOne({ email });
+  if (currentAdmin) {
+    return res
+      .status(409)
+      .json({ success: false, message: "Admin already exists" });
+  }
+
+  const newAdmin = new Admin({
+    name,
+    email,
+    password,
+    phone,
+    adminRoll,
+  });
+  console.log(newAdmin);
+
+  await newAdmin.save();
+
+  return res
+    .status(201)
+    .json({
+      success: true,
+      message: "Admin successfully registered",
+      data: newAdmin,
+    });
 };
 
 export const loginAdmin = async (req, res) => {
