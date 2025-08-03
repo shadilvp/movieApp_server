@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(cookieParser());
 
 app.use(cors({
-  origin: process.env.FRONTEND_URL,
+  origin: "https://movie-app-phi-woad.vercel.app",
   credentials: true,
 }));
 
