@@ -8,6 +8,8 @@ dotenv.config();
 const JWT_SECRET = process.env.TOKEN_SECRET;
 const JWT_REFRESH_SECRET = process.env.TOKEN_REFRESH_SECRET;
 
+const isProduction = process.env.NODE_ENV === "production";
+
 // Helpers
 const generateAccessToken = (user) => {
   return jwt.sign(
@@ -37,12 +39,13 @@ const generateRefreshToken = (user) => {
 export const userRegister = async (req, res) => {
   const { name, email, password } = req.body;
 
-
   try {
     const existingUser = await User.findOne({ where: { email } });
 
     if (existingUser) {
-      return res.status(409).json({ success: false, message: "User already exists" });
+      return res
+        .status(409)
+        .json({ success: false, message: "User already exists" });
     }
 
     const hashedPassword = await bcrypt.hash(password, 10);
@@ -64,14 +67,16 @@ export const userRegister = async (req, res) => {
     });
   } catch (error) {
     console.error("Register error:", error);
-    return res.status(500).json({ success: false, message: "Server error", error: error.message });
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
 // Login
 export const loginUser = async (req, res) => {
   const { email, password } = req.body;
-    console.log( "email: ", email, "pass: " , password)
+  console.log("email: ", email, "pass: ", password);
 
   try {
     const user = await User.findOne({ where: { email } });
@@ -79,35 +84,33 @@ export const loginUser = async (req, res) => {
     if (!user) {
       return res.status(401).json({ success: false, message: "No user found" });
     }
-    
 
     const isMatch = await bcrypt.compare(password, user.password);
-    
 
     if (!isMatch) {
-      return res.status(400).json({ success: false, message: "Invalid password" });
+      return res
+        .status(400)
+        .json({ success: false, message: "Invalid password" });
     }
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
 
     await user.update({ refreshToken });
-    
 
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, 
+      secure: isProduction,
+      sameSite: isProduction ? "None" : "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.cookie("refreshToken", refreshToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "Strict",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      secure: isProduction,
+      sameSite: isProduction ? "None" : "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
-    console.log("helo")
 
     return res.status(200).json({
       success: true,
@@ -120,18 +123,22 @@ export const loginUser = async (req, res) => {
     });
   } catch (error) {
     console.error("Login Error:", error);
-    return res.status(500).json({ success: false, message: "Server error", error: error.message });
+    return res
+      .status(500)
+      .json({ success: false, message: "Server error", error: error.message });
   }
 };
 
 // Logout
 export const logout = async (req, res) => {
   try {
-    console.log("logout")
+    console.log("logout");
     const refreshToken = req.cookies.refreshToken;
 
     if (!refreshToken) {
-      return res.status(400).json({ success: false, message: "User already logged out" });
+      return res
+        .status(400)
+        .json({ success: false, message: "User already logged out" });
     }
 
     const user = await User.findOne({ where: { refreshToken } });
@@ -152,10 +159,14 @@ export const logout = async (req, res) => {
       sameSite: "Strict",
     });
 
-    return res.status(200).json({ success: true, message: "Successfully logged out" });
+    return res
+      .status(200)
+      .json({ success: true, message: "Successfully logged out" });
   } catch (error) {
     console.log("Logout Error:", error);
-    return res.status(500).json({ success: false, message: "Something went wrong" });
+    return res
+      .status(500)
+      .json({ success: false, message: "Something went wrong" });
   }
 };
 
@@ -187,13 +198,11 @@ export const refreshAccessToken = async (req, res) => {
 
     return res.status(200).json({ accessToken: newAccessToken });
   } catch (error) {
-    return res.status(403).json({ message: "Invalid or expired refresh token" });
+    return res
+      .status(403)
+      .json({ message: "Invalid or expired refresh token" });
   }
 };
-
-
-
-
 
 export const getCurrentUser = async (req, res) => {
   try {
@@ -221,5 +230,3 @@ export const getCurrentUser = async (req, res) => {
     });
   }
 };
-
-
