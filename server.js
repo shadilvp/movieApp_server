@@ -4,7 +4,7 @@ import dotenv from "dotenv";
 import "./models/index.js"
 import cookieParser from "cookie-parser";
 
-import authRouter from "./router/authRouter.js";
+import authRouter from "./router/authRouter.js"
 import movieRouter from "./router/movieRoutes.js"; 
 import errorHandler from "./middlewares/errorHandler.js";
 
