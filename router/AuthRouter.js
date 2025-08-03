@@ -1,16 +1,14 @@
-import { adminRegister, googleAuth, loginAdmin, loginUser, logout, refreshAccessToken, userRegister } from "../controller/shared/authController.js";
+import { getCurrentUser, loginUser, logout, userRegister } from "../controller/authController.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import express from "express"
+import { verifyAccessToken } from "../middlewares/authMiddleware.js";
 
 const router = express.Router();
 
-router.post('/register-user', asyncHandler(userRegister));
-router.post('/google-auth', asyncHandler(googleAuth));
-router.post('/register-admin', asyncHandler(adminRegister));
-router.post('/login-user', asyncHandler(loginUser))
-router.post('/login-admin', asyncHandler(loginAdmin))
+router.post('/register', asyncHandler(userRegister));
+router.post('/login', asyncHandler(loginUser))
 router.post("/logout", asyncHandler(logout))
-router.post('/refresh-token', refreshAccessToken)
+router.get('/user', verifyAccessToken,getCurrentUser)
 
 
 export default router;
